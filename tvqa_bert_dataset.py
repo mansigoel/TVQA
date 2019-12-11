@@ -130,7 +130,9 @@ class TVQADataset(Dataset):
         """convert words to indices"""
         # sentence_indices = [self.word2idx[w] if w in self.word2idx else self.word2idx["<unk>"]
         #                     for w in self.line_to_words(sentence, eos=eos)]  # 1 is <unk>, unknown
-        input_ids = self.bert_tokenizer.encode(sentence, add_special_tokens=True) # Batch size 1
+        if len(sentence)>512:
+	    sentence = sentence[:512]
+	input_ids = self.bert_tokenizer.encode(sentence,max_length=512, add_special_tokens=True) # Batch size 1
 
         return input_ids
 
@@ -146,7 +148,9 @@ class TVQADataset(Dataset):
             words.extend(pair.split())
         words.append("<eos>")
         sentence = " ".join(words)
-        input_ids = self.bert_tokenizer.encode(sentence, add_special_tokens=True)
+	if len(sentence)>512:
+	    sentence = sentence[:512]
+        input_ids = self.bert_tokenizer.encode(sentence,max_length=512, add_special_tokens=True)
         # sentence_indices = [self.word2idx[w] if w in self.word2idx else self.word2idx["<unk>"]
                             # for w in words]
         return input_ids

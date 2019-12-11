@@ -11,6 +11,8 @@ from tensorboardX import SummaryWriter
 from model.tvqa_bert_abc import ABC
 from tvqa_bert_dataset import TVQADataset, pad_collate, preprocess_inputs
 from config import BaseOptions
+import logging
+logging.basicConfig()
 
 
 def train(opt, dset, model, criterion, optimizer, epoch, previous_best_acc):
@@ -22,14 +24,21 @@ def train(opt, dset, model, criterion, optimizer, epoch, previous_best_acc):
     valid_acc_log = ["batch_idx\tacc"]
     train_corrects = []
     torch.set_grad_enabled(True)
+    print("Start Training")
     for batch_idx, batch in tqdm(enumerate(train_loader)):
         model_inputs, targets, _ = preprocess_inputs(batch, opt.max_sub_l, opt.max_vcpt_l, opt.max_vid_l,
                                                      device=opt.device)
-        outputs = model(*model_inputs)
+        print("Inputs taken")
+	outputs = model(*model_inputs)
+	print("Output recieved")
         loss = criterion(outputs, targets)
+	print("loss computed")
         optimizer.zero_grad()
+	print("optimization")
         loss.backward()
+	print("loss backpropped")
         optimizer.step()
+	print("final optimization")
 
         # measure accuracy and record loss
         train_loss.append(loss.item())
