@@ -8,8 +8,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
 
-from model.tvqa_abc import ABC
-from tvqa_dataset import TVQADataset, pad_collate, preprocess_inputs
+from model.tvqa_bert_abc import ABC
+from tvqa_bert_dataset import TVQADataset, pad_collate, preprocess_inputs
 from config import BaseOptions
 
 

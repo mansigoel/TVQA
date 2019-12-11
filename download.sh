@@ -13,7 +13,7 @@ wget http://tvqa.cs.unc.edu/files/tvqa_data.md5 -q --show-progress
 
 
 # check
-if ! md5sum -c tvqa_data.md5; then
+if  md5sum -c tvqa_data.md5; then
     echo [Log] Found corrupted file, please re-download the files.
     exit 1
 else
