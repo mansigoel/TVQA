@@ -98,12 +98,12 @@ class ABC(nn.Module):
         raw_out_a4 = self.bert_model(a4)[0]
 
 	"""
-        raw_out_q = self.bert_encoding_fc(self.bert_model(q)[0])
-	raw_out_a0 = self.bert_encoding_fc(self.bert_model(a0)[0])
-        raw_out_a1 = self.bert_encoding_fc(self.bert_model(a1)[0])
-        raw_out_a2 = self.bert_encoding_fc(self.bert_model(a2)[0])
-        raw_out_a3 = self.bert_encoding_fc(self.bert_model(a3)[0])
-        raw_out_a4 = self.bert_encoding_fc(self.bert_model(a4)[0])
+        raw_out_q = self.bert_encoding_fc(q)
+	raw_out_a0 = self.bert_encoding_fc(a0)
+        raw_out_a1 = self.bert_encoding_fc(a1)
+        raw_out_a2 = self.bert_encoding_fc(a2)
+        raw_out_a3 = self.bert_encoding_fc(a3)
+        raw_out_a4 = self.bert_encoding_fc(a4)
 
 	#print(raw_out_q)
 
@@ -114,7 +114,7 @@ class ABC(nn.Module):
         if self.sub_flag:
             #e_sub = self.embedding(sub)
             #raw_out_sub, _ = self.lstm_raw(e_sub, sub_l)
-	    raw_out_sub = self.bert_encoding_fc(self.bert_model(sub)[0])
+	    raw_out_sub = self.bert_encoding_fc(sub)
 	    #print(raw_out_sub)
 	    #print("s",raw_out_sub.size())
 	    sub_out = self.stream_processor(self.lstm_mature_sub, self.classifier_sub, raw_out_sub, sub_l,
@@ -126,7 +126,7 @@ class ABC(nn.Module):
         if self.vcpt_flag:
             #e_vcpt = self.embedding(vcpt)
             #raw_out_vcpt, _ = self.lstm_raw(e_vcpt, vcpt_l)
-            raw_out_vcpt = self.bert_encoding_fc(self.bert_model(vcpt)[0])
+            raw_out_vcpt = self.bert_encoding_fc(sub)
 
 	    vcpt_out = self.stream_processor(self.lstm_mature_vcpt, self.classifier_vcpt, raw_out_vcpt, vcpt_l,
                                              raw_out_q, q_l, raw_out_a0, a0_l, raw_out_a1, a1_l,

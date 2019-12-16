@@ -8,8 +8,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
 
-from model.tvqa_bert_abc import ABC
-from tvqa_bert_dataset import TVQADataset, pad_collate, preprocess_inputs
+from model.tvqa_abc import ABC
+from tvqa_dataset import TVQADataset, pad_collate, preprocess_inputs
 from config import BaseOptions
 import logging
 logging.basicConfig()
@@ -28,22 +28,23 @@ def train(opt, dset, model, criterion, optimizer, epoch, previous_best_acc):
     for batch_idx, batch in tqdm(enumerate(train_loader)):
         model_inputs, targets, _ = preprocess_inputs(batch, opt.max_sub_l, opt.max_vcpt_l, opt.max_vid_l,
                                                      device=opt.device)
-        print("Inputs taken")
+        #print("Inputs taken")
 	outputs = model(*model_inputs)
-	print("Output recieved")
+	#print("Output recieved")
         loss = criterion(outputs, targets)
-	print("loss computed")
+	#print("loss computed")
         optimizer.zero_grad()
-	print("optimization")
+	#print("optimization")
         loss.backward()
-	print("loss backpropped")
+	#print("loss backpropped")
         optimizer.step()
-	print("final optimization")
+	#print("final optimization")
 
         # measure accuracy and record loss
         train_loss.append(loss.item())
         pred_ids = outputs.data.max(1)[1]
         train_corrects += pred_ids.eq(targets.data).cpu().numpy().tolist()
+	#print("corrects computed")
         if batch_idx % opt.log_freq == 0:
             niter = epoch * len(train_loader) + batch_idx
 
@@ -51,9 +52,9 @@ def train(opt, dset, model, criterion, optimizer, epoch, previous_best_acc):
             train_loss = sum(train_loss) / float(len(train_corrects))
             opt.writer.add_scalar("Train/Acc", train_acc, niter)
             opt.writer.add_scalar("Train/Loss", train_loss, niter)
-
+	    #print("adding accuracy")
             # Test
-            valid_acc, valid_loss = validate(opt, dset, model, mode="valid")
+	    valid_acc, valid_loss = validate(opt, dset, model, mode="valid")
             opt.writer.add_scalar("Valid/Loss", valid_loss, niter)
 
             valid_log_str = "%02d\t%.4f" % (batch_idx, valid_acc)
@@ -61,12 +62,15 @@ def train(opt, dset, model, criterion, optimizer, epoch, previous_best_acc):
             if valid_acc > previous_best_acc:
                 previous_best_acc = valid_acc
                 torch.save(model.state_dict(), os.path.join(opt.results_dir, "best_valid.pth"))
-            print(" Train Epoch %d loss %.4f acc %.4f Val loss %.4f acc %.4f"
+            
+	    print(" Train Epoch %d loss %.4f acc %.4f val_loss %.4f val_acc %.4f"
                   % (epoch, train_loss, train_acc, valid_loss, valid_acc))
 
             # reset to train
             torch.set_grad_enabled(True)
-            model.train()
+            #print("Training Starts")
+	    model.train()
+            #print("batch trained")
             dset.set_mode("train")
             train_corrects = []
             train_loss = []
@@ -90,8 +94,10 @@ def validate(opt, dset, model, mode="valid"):
     valid_qids = []
     valid_loss = []
     valid_corrects = []
-    for _, batch in enumerate(valid_loader):
-        model_inputs, targets, qids = preprocess_inputs(batch, opt.max_sub_l, opt.max_vcpt_l, opt.max_vid_l,
+    #print(len(valid_loader))
+    for num, batch in enumerate(valid_loader):
+        #print(num)
+	model_inputs, targets, qids = preprocess_inputs(batch, opt.max_sub_l, opt.max_vcpt_l, opt.max_vid_l,
                                                         device=opt.device)
         outputs = model(*model_inputs)
         loss = criterion(outputs, targets)
